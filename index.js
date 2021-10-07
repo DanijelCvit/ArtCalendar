@@ -6,7 +6,18 @@ async function fetchData(url) {
 }
 
 //Gets and shows any images
-function renderImage() {}
+function renderImage(artwork) {
+  const artImage = document.querySelector("#artwork-image img");
+  console.log(artwork.length);
+  artImage.src = artwork.webImage.url;
+}
+
+function renderData(artwork) {
+  const artistName = document.querySelector("#artist-artwork-name h3");
+  const artworkName = document.querySelector("#artist-artwork-name p");
+  artistName.textContent = artwork.principalOrFirstMaker;
+  artworkName.textContent = artwork.title;
+}
 
 //Manages retrieval and display of search queries
 async function main() {
@@ -32,8 +43,12 @@ async function main() {
   const url = `https://www.rijksmuseum.nl/api/nl/collection?key=${searchObj.key}&involvedMaker=Rembrandt+van+Rijn`;
 
   try {
-    const results = await fetchData(url);
-    console.log("Fetch results:", results);
+    const { artObjects } = await fetchData(url);
+    console.log("Fetch results:", artObjects);
+    const artwork = artObjects[Math.floor(Math.random() * artObjects.length)];
+
+    renderImage(artwork);
+    renderData(artwork);
   } catch (error) {
     console.log("Something went wrong:", error.message);
   }
