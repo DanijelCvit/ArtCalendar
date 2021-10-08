@@ -24,6 +24,7 @@ function renderData(artwork) {
     today
   );
 
+  //Make Sundays number red
   if (weekday === "Sunday") {
     date[0].style.color = "#dd0000";
   }

@@ -10,13 +10,22 @@ header {
   font-size: 2rem;
 }
 
+header,
+nav {
+  text-align: center;
+}
+
 main {
   margin-top: 2rem;
 }
 
-header,
-nav {
-  text-align: center;
+input {
+  border: 0;
+  border-bottom: 1px solid grey;
+  padding-bottom: 0.1rem;
+}
+input:focus {
+  outline: none;
 }
 
 .container {
@@ -43,6 +52,7 @@ nav {
   position: relative;
   bottom: -1rem;
   font-size: 5rem;
+  padding-right: 0.5rem;
 }
 
 .calendar-info .weekday,
@@ -52,4 +62,11 @@ nav {
 
 .calendar-info li:last-child {
   margin-left: auto;
+}
+
+/* Smaller screens */
+@media screen and (max-width: 600px) {
+  html {
+    font-size: 13px;
+  }
 }
