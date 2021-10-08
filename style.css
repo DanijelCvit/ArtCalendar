@@ -45,6 +45,11 @@ nav {
   font-size: 5rem;
 }
 
+.calendar-info .weekday,
+.calendar-info .month {
+  font-style: italic;
+}
+
 .calendar-info li:last-child {
   margin-left: auto;
 }

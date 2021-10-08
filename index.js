@@ -24,6 +24,9 @@ function renderData(artwork) {
     today
   );
 
+  if (weekday === "Sunday") {
+    date[0].style.color = "#dd0000";
+  }
   date[0].textContent = today.getDate();
   date[1].textContent = weekday;
   date[2].textContent = month;
