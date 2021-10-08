@@ -13,8 +13,8 @@ function renderImage(artwork) {
 }
 
 function renderData(artwork) {
-  const artistName = document.querySelector("#artist-artwork-name h3");
-  const artworkName = document.querySelector("#artist-artwork-name p");
+  const artistName = document.querySelector(".artist-artwork-name h3");
+  const artworkName = document.querySelector(".artist-artwork-name p");
   const date = document.querySelectorAll(".date");
   const today = new Date();
   const weekday = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
@@ -65,6 +65,14 @@ async function main() {
 
     renderImage(artwork);
     renderData(artwork);
+
+    const searchField = document.getElementById("searchField");
+    searchField.onkeyup = (event) => {
+      console.log(searchField.value);
+      if (event.key === "Enter") {
+        searchField.value = "";
+      }
+    };
   } catch (error) {
     console.log("Something went wrong:", error.message);
   }
