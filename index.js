@@ -15,6 +15,18 @@ function renderImage(artwork) {
 function renderData(artwork) {
   const artistName = document.querySelector("#artist-artwork-name h3");
   const artworkName = document.querySelector("#artist-artwork-name p");
+  const date = document.querySelectorAll(".date");
+  const today = new Date();
+  const weekday = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
+    today
+  );
+  const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(
+    today
+  );
+
+  date[0].textContent = today.getDate();
+  date[1].textContent = weekday;
+  date[2].textContent = month;
   artistName.textContent = artwork.principalOrFirstMaker;
   artworkName.textContent = artwork.title;
 }

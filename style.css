@@ -39,7 +39,7 @@ nav {
   list-style: none;
 }
 
-.calendar-info #date {
+.calendar-info .number {
   position: relative;
   bottom: -1rem;
   font-size: 5rem;
