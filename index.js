@@ -59,19 +59,28 @@ async function main() {
   const url = `https://www.rijksmuseum.nl/api/nl/collection?key=${searchObj.key}&involvedMaker=Rembrandt+van+Rijn`;
 
   try {
-    const { artObjects } = await fetchData(url);
-    console.log("Fetch results:", artObjects);
-    const artwork = artObjects[Math.floor(Math.random() * artObjects.length)];
+    // const { artObjects } = await fetchData(url);
+    // console.log("Fetch results:", artObjects);
+    // const artwork = artObjects[Math.floor(Math.random() * artObjects.length)];
 
-    renderImage(artwork);
-    renderData(artwork);
+    // renderImage(artwork);
+    // renderData(artwork);
 
+    //Get search results after hitting "Enter"
     const searchField = document.getElementById("searchField");
     searchField.onkeyup = (event) => {
       console.log(searchField.value);
       if (event.key === "Enter") {
         searchField.value = "";
       }
+    };
+
+    //Flip Calendar card after mouse click
+    const calendarCard = document.querySelector(".card");
+    console.log(calendarCard.classList);
+
+    calendarCard.onclick = () => {
+      calendarCard.classList.toggle("card-is-flipped");
     };
   } catch (error) {
     console.log("Something went wrong:", error.message);
