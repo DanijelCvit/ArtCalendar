@@ -43,10 +43,10 @@ function calcContainerHeight() {
     document.querySelector(".calendar-info").clientHeight;
   console.log("info =", calendarInfoHeight);
 
-  const totalHeight = imgHeight + calendarInfoHeight;
+  const container = document.querySelector(".container");
+  const totalHeight = container.clientHeight + imgHeight + calendarInfoHeight;
   console.log("total =", totalHeight);
 
-  const container = document.querySelector(".container");
   container.style.height = `${totalHeight}px`;
   console.log(container.style.height);
 }

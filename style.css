@@ -33,20 +33,16 @@ main {
 
 .container {
   margin: 0 auto;
-  /* padding-top: 2rem; */
   width: 95%;
-  /* border-top: 1px solid black; */
-  /* border-bottom: 1px solid black; */
-  /* border: 2px solid #0000dd; */
+  /* border: 1px solid red; */
 }
+
 /* FLIP CARD START*/
 .scene {
   height: 100%;
   width: 100%;
-  /* height: 100vh; */
-  /* border: 2px solid green; */
   perspective: 2000px;
-  background-color: lightpink;
+  /* background-color: lightpink; */
 }
 
 .card {
@@ -70,15 +66,13 @@ main {
 }
 
 .card .card-front {
-  background-color: salmon;
+  /* background-color: salmon; */
 }
 
 .card-is-flipped {
   transform: rotateY(180deg);
 }
 /* FLIP CARD END */
-
-/* REMOVE AFTER TESTING */
 
 #artwork-image {
   display: block;
@@ -91,7 +85,7 @@ main {
   justify-content: space-between;
   align-items: flex-end;
   padding: 1rem 0;
-  background-color: lightgrey;
+  /* background-color: lightgrey; */
 }
 
 .calendar-info .date-container {
@@ -100,19 +94,21 @@ main {
 }
 
 .calendar-info .number {
-  /* border-bottom: 1px solid red; */
-  display: inline-block;
-  line-height: 0.66;
-  /* backface-visibility: hidden; */
-  /* position: relative; */
-  /* bottom: -17px; */
+  backface-visibility: hidden;
+  position: relative;
+  left: -10px;
+  bottom: -17px;
   font-size: 5rem;
-  padding-right: 0.5rem;
+  /* border: 1px solid red; */
 }
 
 .calendar-info .weekday,
 .calendar-info .month {
   font-style: italic;
+  /* border-bottom: 1px solid red; */
+}
+
+.name-artist-artwork {
   /* border-bottom: 1px solid red; */
 }
 
