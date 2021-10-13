@@ -7,7 +7,7 @@ async function fetchData(url) {
 
 //Gets and shows any images
 function renderImage(artwork) {
-  const artImage = document.querySelector("#artwork-image img");
+  const artImage = document.querySelector("#artwork-image");
   artImage.src = artwork.webImage.url;
 }
 
@@ -56,21 +56,31 @@ async function main() {
   // NOTE: THIS KEY WILL NOT BE UPLOADED TO GITHUB
   const key = config.SECRET_API_KEY;
   let searchObj = {
-    key: key, // This should be obfuscated somehow
-    format: "json", // json / jsonp / xml
-    culture: "nl", // nl / en
-    p: 0, // 0-n (result page)
-    ps: 10, // 1-100 (results per page)
-    q: "", // a-z Search query
-    involveMaker: "", // a-z Made by
-    type: "", // a-z
+    // This should be obfuscated somehow
+    key: key,
+    // json / jsonp / xml
+    format: "json",
+    // nl / en
+    culture: "nl",
+    // 0-n (result page)
+    p: 0,
+    // 1-100 (results per page)
+    ps: 10,
+    // a-z Search query
+    q: "",
+    // a-z Made by
+    involveMaker: "",
+    // a-z
+    type: "",
     material: "",
     technique: "",
     "f.dating.period": " ",
     "f.normalized32Colors.hex": "",
-    imgonly: false, // true / false
-    toppieces: false, // true / false
-    s: "relevance", // sort by relevance / objecttype / chronologic / achronologic / artist ( a-z) / artistdesc (z-a)
+    imgonly: false,
+    toppieces: false,
+    // sort by relevance / objecttype / chronologic
+    // achronologic / artist ( a-z) / artistdesc (z-a)
+    s: "relevance",
   };
   const url = `https://www.rijksmuseum.nl/api/nl/collection?key=${searchObj.key}&involvedMaker=Rembrandt+van+Rijn`;
 
