@@ -37,11 +37,13 @@ main {
 
 .container {
   margin: 0 auto;
-  width: 100%;
+  width: 95%;
+  /* border-top: 1px solid black; */
+  /* padding-top: 1rem; */
   /* border: 1px solid red; */
 }
 
-/* FLIP CARD START*/
+/* FLIP CARD SETUP*/
 .scene {
   height: 100%;
   width: 100%;
@@ -76,8 +78,8 @@ main {
 .card-is-flipped {
   transform: rotateY(180deg);
 }
-/* FLIP CARD END */
 
+/* CARD FRONT */
 #artwork-image {
   display: block;
   width: 100%;
@@ -89,6 +91,7 @@ main {
   justify-content: space-between;
   align-items: flex-end;
   padding: 1rem 1rem 1rem 0.5rem;
+  border-bottom: 1px solid black;
   /* background-color: lightgrey; */
 }
 
@@ -103,11 +106,13 @@ main {
   /* left: -0.5rem; */
   bottom: -1rem;
   font-size: 5rem;
+  margin-right: 0.5rem;
 }
 
 .calendar-info .weekday,
 .calendar-info .month {
   font-style: italic;
+  padding-right: 2rem;
   /* border-bottom: 1px solid red; */
 }
 
@@ -115,8 +120,16 @@ main {
   /* border-bottom: 1px solid red; */
 }
 
+/* CARD BACK */
 .card .card-back {
-  padding: 1.5rem;
+  /* padding: 1.5rem; */
+  padding: 0.5rem;
+}
+
+.card-back .artwork-info {
+  border-bottom: 1px solid black;
+  border-top: 1px solid black;
+  padding: 0.5rem 0;
 }
 
 .card .card-back .info-item {
@@ -139,17 +152,21 @@ dt:after {
 }
 
 .card-back .artwork-description {
-  margin-top: 2rem;
+  margin: 2rem 0;
 }
 
 .card-back .artwork-description h3 {
   margin-bottom: 0.5rem;
 }
 
+.card-back .footer {
+  border-top: 1px solid black;
+}
+
 /************************************* TABLET *************************************/
 @media screen and (min-width: 600px) {
   html {
-    /* font-size: normal; */
+    font-size: 16px;
   }
 }
 
