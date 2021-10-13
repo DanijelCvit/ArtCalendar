@@ -8,13 +8,12 @@ async function fetchData(url) {
 //Gets and shows any images
 function renderImage(artwork) {
   const artImage = document.querySelector("#artwork-image img");
-  console.log(artwork.length);
   artImage.src = artwork.webImage.url;
 }
 
 function renderData(artwork) {
-  const artistName = document.querySelector(".artist-artwork-name h3");
-  const artworkName = document.querySelector(".artist-artwork-name p");
+  const artistName = document.querySelector(".name-artist-artwork h3");
+  const artworkName = document.querySelector(".name-artist-artwork p");
   const date = document.querySelectorAll(".date");
   const today = new Date();
   const weekday = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
@@ -33,6 +32,23 @@ function renderData(artwork) {
   date[2].textContent = month;
   artistName.textContent = artwork.principalOrFirstMaker;
   artworkName.textContent = artwork.title;
+}
+
+//Calculate total height based on the image height
+function calcContainerHeight() {
+  const imgHeight = document.querySelector("#artwork-image").clientHeight;
+  console.log("img =", imgHeight);
+
+  const calendarInfoHeight =
+    document.querySelector(".calendar-info").clientHeight;
+  console.log("info =", calendarInfoHeight);
+
+  const totalHeight = imgHeight + calendarInfoHeight;
+  console.log("total =", totalHeight);
+
+  const container = document.querySelector(".container");
+  container.style.height = `${totalHeight}px`;
+  console.log(container.style.height);
 }
 
 //Manages retrieval and display of search queries
@@ -59,12 +75,14 @@ async function main() {
   const url = `https://www.rijksmuseum.nl/api/nl/collection?key=${searchObj.key}&involvedMaker=Rembrandt+van+Rijn`;
 
   try {
-    // const { artObjects } = await fetchData(url);
-    // console.log("Fetch results:", artObjects);
+    const { artObjects } = await fetchData(url);
+    console.log("Fetch results:", artObjects);
     // const artwork = artObjects[Math.floor(Math.random() * artObjects.length)];
+    const artwork = artObjects[0];
 
-    // renderImage(artwork);
-    // renderData(artwork);
+    renderImage(artwork);
+    renderData(artwork);
+    calcContainerHeight();
 
     //Get search results after hitting "Enter"
     const searchField = document.getElementById("searchField");
@@ -77,7 +95,6 @@ async function main() {
 
     //Flip Calendar card after mouse click
     const calendarCard = document.querySelector(".card");
-    console.log(calendarCard.classList);
 
     calendarCard.onclick = () => {
       calendarCard.classList.toggle("card-is-flipped");
