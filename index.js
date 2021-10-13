@@ -6,12 +6,12 @@ async function fetchData(url) {
 }
 
 //Gets and shows any images
-function renderImage(artwork) {
+function renderImage(artObject) {
   const artImage = document.querySelector("#artwork-image");
-  artImage.src = artwork.webImage.url;
+  artImage.src = artObject.webImage.url;
 }
 
-function renderData(artwork) {
+function renderDataFront(artObject) {
   const artistName = document.querySelector(".name-artist-artwork h3");
   const artworkName = document.querySelector(".name-artist-artwork p");
   const date = document.querySelectorAll(".date");
@@ -30,8 +30,8 @@ function renderData(artwork) {
   date[0].textContent = today.getDate();
   date[1].textContent = weekday;
   date[2].textContent = month;
-  artistName.textContent = artwork.principalOrFirstMaker;
-  artworkName.textContent = artwork.title;
+  artistName.textContent = artObject.principalOrFirstMaker;
+  artworkName.textContent = artObject.title;
 }
 
 //Calculate total height based on the image height
@@ -49,6 +49,36 @@ function calcContainerHeight() {
 
   container.style.height = `${totalHeight}px`;
   console.log(container.style.height);
+}
+
+function renderDataBack(artObjectDetails) {
+  const {
+    label,
+    plaqueDescriptionEnglish,
+    subTitle,
+    physicalMedium,
+    principalOrFirstMaker,
+    longTitle,
+    dating,
+  } = artObjectDetails;
+
+  const artObjectInfo = document.querySelectorAll(".artwork-info dd");
+  console.log(artObjectInfo);
+  artObjectInfo[0].textContent = principalOrFirstMaker;
+  artObjectInfo[1].textContent = label.title;
+  artObjectInfo[2].textContent = dating.presentingDate;
+  artObjectInfo[3].textContent = physicalMedium;
+  artObjectInfo[4].textContent = subTitle;
+
+  const artObjectTitle = document.querySelector(".artwork-description h3");
+  artObjectTitle.textContent = label.title;
+
+  const artObjectDescription = document.querySelectorAll(
+    ".artwork-description p"
+  );
+  console.log(plaqueDescriptionEnglish);
+  artObjectDescription[0].textContent = plaqueDescriptionEnglish;
+  artObjectDescription[1].textContent = label.description;
 }
 
 //Manages retrieval and display of search queries
@@ -82,17 +112,24 @@ async function main() {
     // achronologic / artist ( a-z) / artistdesc (z-a)
     s: "relevance",
   };
-  const url = `https://www.rijksmuseum.nl/api/nl/collection?key=${searchObj.key}&involvedMaker=Rembrandt+van+Rijn`;
+  const url = `https://www.rijksmuseum.nl/api/en/collection?key=${searchObj.key}&involvedMaker=Rembrandt+van+Rijn`;
 
   try {
     const { artObjects } = await fetchData(url);
     console.log("Fetch results:", artObjects);
     // const artwork = artObjects[Math.floor(Math.random() * artObjects.length)];
-    const artwork = artObjects[0];
+    const artObject = artObjects[0];
 
-    renderImage(artwork);
-    renderData(artwork);
+    renderImage(artObject);
+    renderDataFront(artObject);
     calcContainerHeight();
+
+    //https://www.rijksmuseum.nl/api/nl/collection/SK-C-5?key=[api-key]
+    const artObjectURL = `${artObjects[0].links.self}?key=${searchObj.key}`;
+    const { artObject: artObjectDetails } = await fetchData(artObjectURL);
+    console.log("Fetch results:", artObjectDetails);
+
+    renderDataBack(artObjectDetails);
 
     //Get search results after hitting "Enter"
     const searchField = document.getElementById("searchField");
@@ -110,7 +147,7 @@ async function main() {
       calendarCard.classList.toggle("card-is-flipped");
     };
   } catch (error) {
-    console.log("Something went wrong:", error.message);
+    console.log("Something went wrong:", error);
   }
 }
 
