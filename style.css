@@ -83,7 +83,6 @@ input:focus {
   justify-content: left;
   align-items: flex-end;
   padding: 1rem 0;
-  list-style: none;
 }
 
 .calendar-info .number {
