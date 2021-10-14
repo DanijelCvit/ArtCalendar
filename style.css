@@ -71,10 +71,6 @@ main {
   /* background-color: seagreen; */
 }
 
-.card .card-front {
-  /* background-color: salmon; */
-}
-
 .card-is-flipped {
   transform: rotateY(180deg);
 }
@@ -113,10 +109,6 @@ main {
 .calendar-info .month {
   font-style: italic;
   padding-right: 2rem;
-  /* border-bottom: 1px solid red; */
-}
-
-.name-artist-artwork {
   /* border-bottom: 1px solid red; */
 }
 
@@ -171,7 +163,4 @@ dt:after {
 }
 
 @media screen and (min-width: 1000px) {
-  html {
-    /* font-size: 4px; */
-  }
 }
