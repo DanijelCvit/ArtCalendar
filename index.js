@@ -12,8 +12,6 @@ function renderImage(artObject) {
 }
 
 function renderDataFront(artObject) {
-  const artistName = document.querySelector(".name-artist-artwork h3");
-  const artworkName = document.querySelector(".name-artist-artwork p");
   const date = document.querySelectorAll(".date");
   const today = new Date();
   const weekday = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
@@ -23,14 +21,19 @@ function renderDataFront(artObject) {
     today
   );
 
+  date[0].textContent = today.getDate();
+  date[1].textContent = weekday;
+  date[2].textContent = month;
+
   //Make Sundays number red
   if (weekday === "Sunday") {
     date[0].style.color = "#dd0000";
   }
-  date[0].textContent = today.getDate();
-  date[1].textContent = weekday;
-  date[2].textContent = month;
+
+  const artistName = document.querySelector(".name-artist-artwork h3");
   artistName.textContent = artObject.principalOrFirstMaker;
+
+  const artworkName = document.querySelector(".name-artist-artwork p");
   artworkName.textContent = artObject.title;
 }
 
@@ -58,7 +61,6 @@ function renderDataBack(artObjectDetails) {
     subTitle,
     physicalMedium,
     principalOrFirstMaker,
-    longTitle,
     dating,
   } = artObjectDetails;
 
