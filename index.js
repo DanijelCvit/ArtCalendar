@@ -5,12 +5,13 @@ async function fetchData(url) {
   return response.json();
 }
 
-//Gets and shows any images
+//Shows the selected image
 function renderImage(artObject) {
   const artImage = document.querySelector("#artwork-image");
   artImage.src = artObject.webImage.url;
 }
 
+//Calculates and display current date, artist and artwork name
 function renderDataFront(artObject) {
   const date = document.querySelectorAll(".date");
   const today = new Date();
@@ -37,23 +38,18 @@ function renderDataFront(artObject) {
   artworkName.textContent = artObject.title;
 }
 
-//Calculate total height based on the image height
+//Calculates total card height based on the current image height
 function calcContainerHeight() {
   const imgHeight = document.querySelector("#artwork-image").clientHeight;
-  console.log("img =", imgHeight);
-
   const calendarInfoHeight =
     document.querySelector(".calendar-info").clientHeight;
-  console.log("info =", calendarInfoHeight);
 
   const container = document.querySelector(".container");
   const totalHeight = container.clientHeight + imgHeight + calendarInfoHeight;
-  console.log("total =", totalHeight);
-
   container.style.height = `${totalHeight}px`;
-  console.log(container.style.height);
 }
 
+// Displays information about the artwork show at front
 function renderDataBack(artObjectDetails) {
   const {
     label,
@@ -62,25 +58,41 @@ function renderDataBack(artObjectDetails) {
     physicalMedium,
     principalOrFirstMaker,
     dating,
+    description,
+    title,
   } = artObjectDetails;
 
   const artObjectInfo = document.querySelectorAll(".artwork-info dd");
-  console.log(artObjectInfo);
   artObjectInfo[0].textContent = principalOrFirstMaker;
-  artObjectInfo[1].textContent = label.title;
+  artObjectInfo[1].textContent = label.title || title;
   artObjectInfo[2].textContent = dating.presentingDate;
   artObjectInfo[3].textContent = physicalMedium;
   artObjectInfo[4].textContent = subTitle;
 
   const artObjectTitle = document.querySelector(".artwork-description h3");
-  artObjectTitle.textContent = label.title;
+  artObjectTitle.textContent = label.title || title;
 
   const artObjectDescription = document.querySelectorAll(
     ".artwork-description p"
   );
-  console.log(plaqueDescriptionEnglish);
-  artObjectDescription[0].textContent = plaqueDescriptionEnglish;
+  artObjectDescription[0].textContent = plaqueDescriptionEnglish || description;
   artObjectDescription[1].textContent = label.description;
+}
+
+function getRandomChar() {
+  const unicode = Math.floor(Math.random() * 26) + 97;
+  const char = String.fromCharCode(unicode);
+
+  return char;
+}
+
+function getRandomObject(results, pageCount) {
+  console.log({ results, pageCount });
+  const page = Math.floor(Math.random() * Math.floor(results / pageCount));
+  const index = Math.floor(Math.random() * pageCount);
+
+  console.log({ page, index });
+  return { page, index };
 }
 
 //Manages retrieval and display of search queries
@@ -93,7 +105,7 @@ async function main() {
     // json / jsonp / xml
     format: "json",
     // nl / en
-    culture: "nl",
+    culture: "en",
     // 0-n (result page)
     p: 0,
     // 1-100 (results per page)
@@ -113,21 +125,34 @@ async function main() {
     // sort by relevance / objecttype / chronologic
     // achronologic / artist ( a-z) / artistdesc (z-a)
     s: "relevance",
+    searchLimit: 10000,
   };
-  const url = `https://www.rijksmuseum.nl/api/en/collection?key=${searchObj.key}&involvedMaker=Rembrandt+van+Rijn`;
 
   try {
+    searchObj.q = `${getRandomChar()}`;
+    let url = `https://www.rijksmuseum.nl/api/${searchObj.culture}/collection?key=${searchObj.key}&q=${searchObj.q}&involveMaker=${searchObj.involveMaker}`;
+
+    const results = await fetchData(url);
+
+    console.log("Fetch results:", results);
+    // const result = artObjects[Math.floor(Math.random() * artObjects.length)];
+    const { countFacets: resultsCount } = results;
+    const { page, index } = getRandomObject(
+      Math.min(resultsCount.hasimage, searchObj.searchLimit),
+      searchObj.ps
+    );
+
+    searchObj.p = page;
+    url = `https://www.rijksmuseum.nl/api/${searchObj.culture}/collection?key=${searchObj.key}&&p=${searchObj.p}`;
     const { artObjects } = await fetchData(url);
-    console.log("Fetch results:", artObjects);
-    // const artwork = artObjects[Math.floor(Math.random() * artObjects.length)];
-    const artObject = artObjects[0];
+    const artObject = artObjects[index];
 
     renderImage(artObject);
     renderDataFront(artObject);
     calcContainerHeight();
 
     //https://www.rijksmuseum.nl/api/nl/collection/SK-C-5?key=[api-key]
-    const artObjectURL = `${artObjects[0].links.self}?key=${searchObj.key}`;
+    const artObjectURL = `${artObjects[index].links.self}?key=${searchObj.key}`;
     const { artObject: artObjectDetails } = await fetchData(artObjectURL);
     console.log("Fetch results:", artObjectDetails);
 
