@@ -97,16 +97,10 @@ function getRandomObject(results, pageCount) {
 }
 
 function displayResults(artObjects) {
-  // Remove any existing search results
-  const searchResults = document.querySelector(".search-results");
-  if (searchResults) {
-    searchResults.remove();
-  }
-
   const imgArray = artObjects.map((obj) => {
     // Create image element
     const imgElement = document.createElement("img");
-    imgElement.src = obj.webImage.url;
+    imgElement.src = obj.webImage.url?.replace("=s0", "=w800");
 
     // Wrap image element in a container
     // const imgContainer = document.createElement("div");
@@ -148,6 +142,10 @@ async function searchArt(url) {
 
   // Print results
   console.log(artObjects);
+}
+
+function infiniteScroll() {
+  console.log(window.pageYOffset);
 }
 
 //Manages retrieval and display of search queries
@@ -232,9 +230,16 @@ async function main() {
         console.log("Invalid input");
         return;
       }
-      searchObj.involveMaker = searchField.value.trim();
-      url = `https://www.rijksmuseum.nl/api/${searchObj.culture}/collection?key=${searchObj.key}&toppieces=${searchObj.toppieces}&imgonly=${searchObj.imgonly}&ps=${searchObj.ps}&q=${searchObj.q}&involveMaker=${searchObj.involveMaker}`;
+      searchObj.q = searchField.value.trim();
+      url = `https://www.rijksmuseum.nl/api/${searchObj.culture}/collection?key=${searchObj.key}&toppieces=${searchObj.toppieces}&imgonly=${searchObj.imgonly}&ps=${searchObj.ps}&q=${searchObj.q}&involveMaker=${searchObj.involveMaker}&s=${searchObj.s}`;
       console.log(url);
+
+      // Remove any existing search results
+      const searchResults = document.querySelector(".search-results");
+      if (searchResults) {
+        searchResults.remove();
+      }
+
       searchArt(url);
     };
   } catch (error) {
@@ -244,3 +249,4 @@ async function main() {
 
 //Call main function after loading page
 window.addEventListener("load", main);
+window.addEventListener("scroll", infiniteScroll);
