@@ -87,12 +87,67 @@ function getRandomChar() {
 }
 
 function getRandomObject(results, pageCount) {
-  console.log({ results, pageCount });
+  // console.log({ results, pageCount });
+
   const page = Math.floor(Math.random() * Math.floor(results / pageCount));
   const index = Math.floor(Math.random() * pageCount);
 
-  console.log({ page, index });
+  // console.log({ page, index });
   return { page, index };
+}
+
+function displayResults(artObjects) {
+  // Remove any existing search results
+  const searchResults = document.querySelector(".search-results");
+  if (searchResults) {
+    searchResults.remove();
+  }
+
+  const imgArray = artObjects.map((obj) => {
+    // Create image element
+    const imgElement = document.createElement("img");
+    imgElement.src = obj.webImage.url;
+
+    // Wrap image element in a container
+    const imgContainer = document.createElement("div");
+    imgContainer.classList.add("img-container");
+    imgContainer.append(imgElement);
+
+    // Create image title
+    const titleElement = document.createElement("p");
+    titleElement.textContent = obj.title;
+
+    // Add everything inside a result element
+    const resultElement = document.createElement("div");
+    resultElement.append(imgContainer, titleElement);
+    resultElement.classList.add("result");
+
+    //Wrap everything inside a flex-container
+    const containerElement = document.createElement("li");
+    containerElement.append(resultElement);
+    containerElement.classList.add("result-container");
+
+    return containerElement;
+  });
+
+  // Hide day calendar
+  const scene = document.querySelector(".scene");
+  scene.style.display = "none";
+
+  // Create container to hold search results
+  const container = document.createElement("ul");
+  container.classList.add("search-results");
+  container.append(...imgArray);
+  scene.parentElement.append(container);
+}
+
+async function searchArt(url) {
+  const { artObjects } = await fetchData(url);
+
+  displayResults(artObjects);
+
+  // Print results
+  console.log(artObjects);
 }
 
 //Manages retrieval and display of search queries
@@ -120,8 +175,8 @@ async function main() {
     technique: "",
     "f.dating.period": " ",
     "f.normalized32Colors.hex": "",
-    imgonly: false,
-    toppieces: false,
+    imgonly: true,
+    toppieces: true,
     // sort by relevance / objecttype / chronologic
     // achronologic / artist ( a-z) / artistdesc (z-a)
     s: "relevance",
@@ -133,45 +188,54 @@ async function main() {
     let url = `https://www.rijksmuseum.nl/api/${searchObj.culture}/collection?key=${searchObj.key}&q=${searchObj.q}&involveMaker=${searchObj.involveMaker}`;
 
     const results = await fetchData(url);
-
     console.log("Fetch results:", results);
-    // const result = artObjects[Math.floor(Math.random() * artObjects.length)];
+
+    // Get  the total number of results
     const { countFacets: resultsCount } = results;
+
+    // Get a random page and item number from results range
     const { page, index } = getRandomObject(
       Math.min(resultsCount.hasimage, searchObj.searchLimit),
       searchObj.ps
     );
 
+    // Fetch art object from random selected page and index
     searchObj.p = page;
-    url = `https://www.rijksmuseum.nl/api/${searchObj.culture}/collection?key=${searchObj.key}&&p=${searchObj.p}`;
+    url = `https://www.rijksmuseum.nl/api/${searchObj.culture}/collection?key=${searchObj.key}&p=${searchObj.p}`;
     const { artObjects } = await fetchData(url);
     const artObject = artObjects[index];
 
+    console.log("Random object: ", artObject);
     renderImage(artObject);
     renderDataFront(artObject);
     calcContainerHeight();
 
-    //https://www.rijksmuseum.nl/api/nl/collection/SK-C-5?key=[api-key]
+    // Get detailed info of art object
+    //url format: https://www.rijksmuseum.nl/api/nl/collection/SK-C-5?key=[api-key]
     const artObjectURL = `${artObjects[index].links.self}?key=${searchObj.key}`;
     const { artObject: artObjectDetails } = await fetchData(artObjectURL);
-    console.log("Fetch results:", artObjectDetails);
+    //console.log("Fetch results:", artObjectDetails);
 
     renderDataBack(artObjectDetails);
+
+    //Flip Calendar card after mouse click
+    const calendarCard = document.querySelector(".card");
+    calendarCard.onclick = () => {
+      calendarCard.classList.toggle("card-is-flipped");
+    };
 
     //Get search results after hitting "Enter"
     const searchField = document.getElementById("searchField");
     searchField.onkeyup = (event) => {
       console.log(searchField.value);
-      if (event.key === "Enter") {
-        searchField.value = "";
+      if (event.key !== "Enter" || !searchField.value.trim()) {
+        console.log("Invalid input");
+        return;
       }
-    };
-
-    //Flip Calendar card after mouse click
-    const calendarCard = document.querySelector(".card");
-
-    calendarCard.onclick = () => {
-      calendarCard.classList.toggle("card-is-flipped");
+      searchObj.q = searchField.value.trim();
+      url = `https://www.rijksmuseum.nl/api/${searchObj.culture}/collection?key=${searchObj.key}&toppieces=${searchObj.toppieces}&imgonly=${searchObj.imgonly}&ps=${searchObj.ps}&q=${searchObj.q}`;
+      console.log(url);
+      searchArt(url);
     };
   } catch (error) {
     console.log("Something went wrong:", error);

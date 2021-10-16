@@ -155,12 +155,66 @@ dt:after {
   border-top: 1px solid black;
 }
 
+/* SEARCH RESULTS */
+.search-results {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  list-style: none;
+}
+
+.search-results .result-container {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 2rem;
+  transition: box-shadow 0.5s;
+}
+
+.search-results .result-container:hover {
+  box-shadow: 0px 3px 3px #8888;
+}
+
+.search-results .result img {
+  display: block;
+  max-width: 100%;
+}
+
+.search-results .img-container {
+  width: 100%;
+}
+
+.search-results .result {
+  width: 100%;
+}
+
+.search-results .result-container p {
+  width: 100%;
+  font-size: 1.5rem;
+  padding: 0 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /************************************* TABLET *************************************/
 @media screen and (min-width: 600px) {
   html {
     font-size: 16px;
   }
+
+  .search-results {
+    flex-direction: row;
+  }
+
+  .search-results .result-container {
+    width: 33.33%;
+  }
 }
 
 @media screen and (min-width: 1000px) {
+  .search-results .result-container {
+    width: 25%;
+  }
 }
