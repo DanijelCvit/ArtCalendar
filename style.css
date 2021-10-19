@@ -176,7 +176,7 @@ dt:after {
   width: 100%;
   text-align: center;
   margin-bottom: 2rem;
-  transition: box-shadow 0.5s;
+  transition: box-shadow 0.2s;
   border-bottom: 1px solid darkgray;
 }
 

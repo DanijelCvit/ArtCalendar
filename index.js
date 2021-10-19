@@ -8,7 +8,7 @@ async function fetchData(url) {
 //Shows the selected image
 function renderImage(artObject) {
   const artImage = document.querySelector("#artwork-image");
-  artImage.src = artObject.webImage.url;
+  artImage.src = artObject?.webImage?.url;
 }
 
 //Calculates and display current date, artist and artwork name
@@ -87,12 +87,9 @@ function getRandomChar() {
 }
 
 function getRandomObject(results, pageCount) {
-  // console.log({ results, pageCount });
-
   const page = Math.floor(Math.random() * Math.floor(results / pageCount));
   const index = Math.floor(Math.random() * pageCount);
 
-  // console.log({ page, index });
   return { page, index };
 }
 
@@ -101,11 +98,6 @@ function displayResults(artObjects) {
     // Create image element
     const imgElement = document.createElement("img");
     imgElement.src = obj.webImage.url?.replace("=s0", "=w800");
-
-    // Wrap image element in a container
-    // const imgContainer = document.createElement("div");
-    // imgContainer.classList.add("img-container");
-    // imgContainer.append(imgElement);
 
     // Create image title
     const titleElement = document.createElement("p");
@@ -128,119 +120,129 @@ function displayResults(artObjects) {
   const scene = document.querySelector(".scene");
   scene.style.display = "none";
 
-  // Create container to hold search results
-  const container = document.createElement("ul");
-  container.classList.add("search-results");
+  // Create container to hold search results if none exist
+  let container = document.querySelector(".search-results");
+  if (!container) {
+    container = document.createElement("ul");
+    container.classList.add("search-results");
+    scene.parentElement.append(container);
+  }
   container.append(...imgArray);
-  scene.parentElement.append(container);
 }
 
 async function searchArt(url) {
+  console.log(url);
+
   const { artObjects } = await fetchData(url);
 
-  displayResults(artObjects);
+  if (artObjects.length) {
+    displayResults(artObjects);
+  }
 
   // Print results
   console.log(artObjects);
-}
-
-function infiniteScroll() {
-  console.log(window.pageYOffset);
 }
 
 //Manages retrieval and display of search queries
 async function main() {
   // NOTE: THIS KEY WILL NOT BE UPLOADED TO GITHUB
   const key = config.SECRET_API_KEY;
-  let searchObj = {
-    // This should be obfuscated somehow
+  let query = {
     key: key,
-    // json / jsonp / xml
     format: "json",
-    // nl / en
     culture: "en",
-    // 0-n (result page)
-    p: 0,
-    // 1-100 (results per page)
+    p: 1,
     ps: 40,
-    // a-z Search query
     q: "",
-    // a-z Made by
     involveMaker: "",
-    // a-z
     type: "",
-    material: "",
+    material: "canvas",
     technique: "",
     "f.dating.period": " ",
     "f.normalized32Colors.hex": "",
     imgonly: true,
     toppieces: true,
-    // sort by relevance / objecttype / chronologic
-    // achronologic / artist ( a-z) / artistdesc (z-a)
     s: "relevance",
     searchLimit: 10000,
+    get url() {
+      return `https://www.rijksmuseum.nl/api/${this.culture}/collection?key=${this.key}&material=${this.material}&technique=${this.technique}&toppieces=${this.toppieces}&imgonly=${this.imgonly}&p=${this.p}&ps=${this.ps}&q=${this.q}&involveMaker=${this.involveMaker}&s=${this.s}`;
+    },
   };
 
   try {
-    // searchObj.q = `${getRandomChar()}`;
-    let url = `https://www.rijksmuseum.nl/api/${searchObj.culture}/collection?key=${searchObj.key}&q=${searchObj.q}&involveMaker=${searchObj.involveMaker}`;
-
-    // const results = await fetchData(url);
-    // console.log("Fetch results:", results);
+    // Select random letter from [a-z] and fetch result
+    query.q = getRandomChar();
+    const results = await fetchData(query.url);
+    console.log(`Fetch results for '${query.q}:'`, results);
 
     // Get  the total number of results
-    // const { countFacets: resultsCount } = results;
+    const { count } = results;
 
-    // Get a random page and item number from results range
-    // const { page, index } = getRandomObject(
-    //   Math.min(resultsCount.hasimage, searchObj.searchLimit),
-    //   searchObj.ps
-    // );
+    // Get a random page and item number from total number
+    const { page, index } = getRandomObject(
+      Math.min(count, query.searchLimit),
+      query.ps
+    );
 
     // Fetch art object from random selected page and index
-    // searchObj.p = page;
-    // url = `https://www.rijksmuseum.nl/api/${searchObj.culture}/collection?key=${searchObj.key}&p=${searchObj.p}`;
-    // const { artObjects } = await fetchData(url);
-    // const artObject = artObjects[index];
+    query.p = page;
+    const { artObjects } = await fetchData(query.url);
+    const artObject = artObjects[index];
 
-    // console.log("Random object: ", artObject);
-    // renderImage(artObject);
-    // renderDataFront(artObject);
-    // calcContainerHeight();
+    console.log("Random object: ", artObject);
+    renderImage(artObject);
+    renderDataFront(artObject);
+    calcContainerHeight();
 
-    // Get detailed info of art object
-    //url format: https://www.rijksmuseum.nl/api/nl/collection/SK-C-5?key=[api-key]
-    // const artObjectURL = `${artObjects[index].links.self}?key=${searchObj.key}`;
-    // const { artObject: artObjectDetails } = await fetchData(artObjectURL);
-    // //console.log("Fetch results:", artObjectDetails);
+    //Get detailed info for back of card
+    const artObjectURL = `${artObject.links.self}?key=${query.key}`;
+    const { artObject: artObjectDetails } = await fetchData(artObjectURL);
+    console.log("Fetch results:", artObjectDetails);
 
-    // renderDataBack(artObjectDetails);
+    renderDataBack(artObjectDetails);
 
-    //Flip Calendar card after mouse click
-    // const calendarCard = document.querySelector(".card");
-    // calendarCard.onclick = () => {
-    //   calendarCard.classList.toggle("card-is-flipped");
-    // };
+    // Flip Calendar card after mouse click
+    const calendarCard = document.querySelector(".card");
+    calendarCard.onclick = () => {
+      calendarCard.classList.toggle("card-is-flipped");
+    };
 
     //Get search results after hitting "Enter"
     const searchField = document.getElementById("searchField");
     searchField.onkeyup = (event) => {
+      query.q = searchField.value.trim();
       console.log(searchField.value);
-      if (event.key !== "Enter" || !searchField.value.trim()) {
+      if (event.key !== "Enter" || !query.q) {
         console.log("Invalid input");
         return;
       }
-      searchObj.q = searchField.value.trim();
-      url = `https://www.rijksmuseum.nl/api/${searchObj.culture}/collection?key=${searchObj.key}&toppieces=${searchObj.toppieces}&imgonly=${searchObj.imgonly}&ps=${searchObj.ps}&q=${searchObj.q}&involveMaker=${searchObj.involveMaker}&s=${searchObj.s}`;
-      console.log(url);
+
+      // Reset page to 1 for new query
+      query.p = 1;
 
       // Remove any existing search results
       const searchResults = document.querySelector(".search-results");
       if (searchResults) {
         searchResults.remove();
       }
+      searchArt(query.url);
+    };
 
-      searchArt(url);
+    window.onscroll = () => {
+      // If day calendar is visible disable infinite scroll
+      const scene = document.querySelector(".scene");
+      if (scene.style.display !== "none") {
+        return;
+      }
+      // Calculate when we reach the end of document
+      const endOfDoc =
+        document.documentElement.scrollHeight - window.scrollY ===
+        document.documentElement.clientHeight;
+
+      if (endOfDoc) {
+        query.p++;
+        searchArt(query.url);
+      }
     };
   } catch (error) {
     console.log("Something went wrong:", error);
@@ -249,4 +251,3 @@ async function main() {
 
 //Call main function after loading page
 window.addEventListener("load", main);
-window.addEventListener("scroll", infiniteScroll);
