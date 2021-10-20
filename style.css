@@ -156,6 +156,13 @@ dt:after {
   border-top: 1px solid black;
 }
 
+.scene .close-button {
+  font-size: 3rem;
+  color: rgba(255, 255, 2555, 0.5);
+  position: absolute;
+  right: 10px;
+}
+
 /* SEARCH RESULTS */
 .search-results {
   display: flex;
@@ -166,7 +173,6 @@ dt:after {
   list-style: none;
   margin-left: 1rem;
   margin-right: 1rem;
-
   /* height: 1500px; */
 }
 

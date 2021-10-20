@@ -6,13 +6,18 @@ async function fetchData(url) {
 }
 
 //Shows the selected image
-function renderImage(artObject) {
-  const artImage = document.querySelector("#artwork-image");
-  artImage.src = artObject?.webImage?.url;
-}
+// function renderImage(artObject) {
+//   const artImage = document.querySelector("#artwork-image");
+//   artImage.src = artObject?.webImage?.url;
+// }
 
 //Calculates and display current date, artist and artwork name
 function renderDataFront(artObject) {
+  // Render image
+  const artImage = document.querySelector("#artwork-image");
+  artImage.src = artObject?.webImage?.url;
+
+  // Render calendar info
   const date = document.querySelectorAll(".date");
   const today = new Date();
   const weekday = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
@@ -50,7 +55,9 @@ function calcContainerHeight() {
 }
 
 // Displays information about the artwork show at front
-function renderDataBack(artObjectDetails) {
+async function renderDataBack(artObjectDetails) {
+  //Get detailed info for back of card
+
   const {
     label,
     plaqueDescriptionEnglish,
@@ -93,11 +100,14 @@ function getRandomObject(results, pageCount) {
   return { page, index };
 }
 
-function displayResults(artObjects) {
+function displayResults(artObjects, url) {
   const imgArray = artObjects.map((obj) => {
     // Create image element
+    const key = url.match(/key=\w+/);
     const imgElement = document.createElement("img");
     imgElement.src = obj.webImage.url?.replace("=s0", "=w800");
+    imgElement.objURL = `${obj.links.self}?${key}`;
+    console.log(imgElement.objURL);
 
     // Create image title
     const titleElement = document.createElement("p");
@@ -120,13 +130,9 @@ function displayResults(artObjects) {
   const scene = document.querySelector(".scene");
   scene.style.display = "none";
 
-  // Create container to hold search results if none exist
-  let container = document.querySelector(".search-results");
-  if (!container) {
-    container = document.createElement("ul");
-    container.classList.add("search-results");
-    scene.parentElement.append(container);
-  }
+  // Get search container to append results to
+  const container = document.querySelector(".search-results");
+  console.log(container);
   container.append(...imgArray);
 }
 
@@ -136,7 +142,7 @@ async function searchArt(url) {
   const { artObjects } = await fetchData(url);
 
   if (artObjects.length) {
-    displayResults(artObjects);
+    displayResults(artObjects, url);
   }
 
   // Print results
@@ -190,15 +196,13 @@ async function main() {
     const artObject = artObjects[index];
 
     console.log("Random object: ", artObject);
-    renderImage(artObject);
+    // renderImage(artObject);
     renderDataFront(artObject);
     calcContainerHeight();
 
-    //Get detailed info for back of card
     const artObjectURL = `${artObject.links.self}?key=${query.key}`;
     const { artObject: artObjectDetails } = await fetchData(artObjectURL);
-    console.log("Fetch results:", artObjectDetails);
-
+    // console.log("Fetch results:", artObjectDetails);
     renderDataBack(artObjectDetails);
 
     // Flip Calendar card after mouse click
@@ -222,9 +226,7 @@ async function main() {
 
       // Remove any existing search results
       const searchResults = document.querySelector(".search-results");
-      if (searchResults) {
-        searchResults.remove();
-      }
+      searchResults.innerHTML = "";
       searchArt(query.url);
     };
 
@@ -243,6 +245,24 @@ async function main() {
         query.p++;
         searchArt(query.url);
       }
+    };
+
+    const searchResults = document.querySelector(".search-results");
+    searchResults.onclick = async (event) => {
+      // Show day calendar container (scene)
+      const scene = document.querySelector(".scene");
+      scene.style.display = "block";
+      // Hide search container
+      searchResults.style.display = "none";
+
+      // Fetch selected artObject
+      const selectedImageURL = event.target.objURL;
+      const { artObject } = await fetchData(selectedImageURL);
+
+      // Render selected artObject
+      renderDataFront(artObject);
+      calcContainerHeight();
+      renderDataBack(artObject);
     };
   } catch (error) {
     console.log("Something went wrong:", error);
