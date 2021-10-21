@@ -11,6 +11,13 @@ function renderDataFront(artObject) {
   const artImage = document.querySelector("#artwork-image");
   artImage.src = artObject?.webImage?.url;
 
+  // Remove loading gif
+  const loadingGIF = document.querySelector(".loading-gif");
+  loadingGIF.style.display = "none";
+
+  //Enable artImage
+  artImage.style.display = "block";
+
   // Render calendar info
   const date = document.querySelectorAll(".date");
   const today = new Date();
@@ -37,15 +44,14 @@ function renderDataFront(artObject) {
   artworkName.textContent = artObject.title;
 }
 
-//Calculates total card height based on the current image height
-function calcContainerHeight() {
-  const imgHeight = document.querySelector("#artwork-image").clientHeight;
+function calcTotalHeight() {
+  const imgHeight = document.querySelector("#artwork-image").offsetHeight;
   const calendarInfoHeight =
-    document.querySelector(".calendar-info").clientHeight;
+    document.querySelector(".calendar-info").offsetHeight;
 
-  const container = document.querySelector(".container");
-  const totalHeight = container.clientHeight + imgHeight + calendarInfoHeight;
-  container.style.height = `${totalHeight}px`;
+  const scene = document.querySelector(".scene");
+  const totalHeight = imgHeight + calendarInfoHeight;
+  scene.style.height = `${totalHeight}px`;
 }
 
 // Displays information about the artwork show at front
@@ -87,9 +93,14 @@ function getRandomChar() {
   return char;
 }
 
-function getRandomObject(results, pageCount) {
-  const page = Math.floor(Math.random() * Math.floor(results / pageCount));
-  const index = Math.floor(Math.random() * pageCount);
+function getRandomObject(results, pageItems) {
+  const maxPages = Math.ceil(results / pageItems);
+  const minPageItems = results % pageItems;
+  const page = Math.ceil(Math.random() * maxPages);
+  const index =
+    page === maxPages
+      ? Math.floor(Math.random() * minPageItems)
+      : Math.floor(Math.random() * pageItems);
 
   return { page, index };
 }
@@ -133,6 +144,16 @@ async function searchArt(url) {
 
   if (artObjects.length) {
     displayResults(artObjects, url);
+  } else {
+    const scene = document.querySelector(".scene");
+    scene.style.display = "none";
+    const searchResults = document.querySelector(".search-results");
+    const nothingFound = document.createElement("div");
+    nothingFound.classList.add("nothing-found");
+    const message = document.createElement("p");
+    message.textContent = "Your search did not match any art objects";
+    nothingFound.append(message);
+    searchResults.append(nothingFound);
   }
 }
 
@@ -166,7 +187,6 @@ async function main() {
     // Select random letter from [a-z] and fetch result
     query.q = getRandomChar();
     const results = await fetchData(query.url);
-    console.log(`Fetch results for '${query.q}:'`, results);
 
     // Get  the total number of results
     const { count } = results;
@@ -181,8 +201,6 @@ async function main() {
     query.p = page;
     const { artObjects } = await fetchData(query.url);
     const artObject = artObjects[index];
-
-    console.log("Random object: ", artObject);
     renderDataFront(artObject);
 
     const artObjectURL = `${artObject.links.self}?key=${query.key}`;
@@ -197,17 +215,14 @@ async function main() {
 
     //Get search results after hitting "Enter"
     const searchField = document.getElementById("searchField");
+
     searchField.onkeyup = (event) => {
       query.q = searchField.value.trim();
-      console.log(searchField.value);
       if (event.key !== "Enter" || !query.q) {
-        console.log("Invalid input");
         return;
       }
-
       // Reset page to 1 for new query
       query.p = 1;
-
       // Remove any existing search results
       const searchResults = document.querySelector(".search-results");
       searchResults.innerHTML = "";
@@ -215,39 +230,45 @@ async function main() {
     };
 
     const scrollTrigger = { previous: false, current: false };
+
     window.onscroll = () => {
       // If day calendar is visible disable infinite scroll
       const scene = document.querySelector(".scene");
       if (scene.style.display !== "none") {
         return;
       }
-
       scrollTrigger.previous = scrollTrigger.current;
       scrollTrigger.current =
         document.documentElement.scrollHeight - window.scrollY - 500 <=
         document.documentElement.clientHeight;
 
       if (!scrollTrigger.previous && scrollTrigger.current) {
-        console.log(
-          `%c` + JSON.stringify(scrollTrigger),
-          "color:white; background-color:green; padding: 0 5px;"
-        );
-
         query.p++;
         searchArt(query.url);
       } else {
-        console.log(
-          `%c` + JSON.stringify(scrollTrigger),
-          "color:white; background-color:red; padding: 0 5px;"
-        );
       }
     };
 
+    const artImage = document.getElementById("artwork-image");
+    artImage.onload = calcTotalHeight;
+
     const searchResults = document.querySelector(".search-results");
     searchResults.onclick = async (event) => {
+      // Check if no image is clicked
+      if (!event.target.src) {
+        return;
+      }
       // Show day calendar container (scene)
       const scene = document.querySelector(".scene");
       scene.style.display = "block";
+
+      // Enable loading gif
+      const loadingGIF = document.querySelector(".loading-gif");
+      loadingGIF.style.display = "flex";
+
+      const artImage = document.querySelector("#artwork-image");
+      artImage.style.display = "none";
+
       // Hide search container
       searchResults.style.display = "none";
 
@@ -261,7 +282,6 @@ async function main() {
 
       // Render selected artObject
       renderDataFront(artObject);
-      calcContainerHeight();
       renderDataBack(artObject);
     };
 
@@ -269,7 +289,7 @@ async function main() {
     closeButton.onclick = (event) => {
       const scene = document.querySelector(".scene");
       scene.style.display = "none";
-      // Hide search container
+
       searchResults.style.display = "flex";
       event.stopPropagation();
     };
