@@ -5,12 +5,6 @@ async function fetchData(url) {
   return response.json();
 }
 
-//Shows the selected image
-// function renderImage(artObject) {
-//   const artImage = document.querySelector("#artwork-image");
-//   artImage.src = artObject?.webImage?.url;
-// }
-
 //Calculates and display current date, artist and artwork name
 function renderDataFront(artObject) {
   // Render image
@@ -107,7 +101,6 @@ function displayResults(artObjects, url) {
     const imgElement = document.createElement("img");
     imgElement.src = obj.webImage.url?.replace("=s0", "=w800");
     imgElement.objURL = `${obj.links.self}?${key}`;
-    console.log(imgElement.objURL);
 
     // Create image title
     const titleElement = document.createElement("p");
@@ -132,21 +125,15 @@ function displayResults(artObjects, url) {
 
   // Get search container to append results to
   const container = document.querySelector(".search-results");
-  console.log(container);
   container.append(...imgArray);
 }
 
 async function searchArt(url) {
-  console.log(url);
-
   const { artObjects } = await fetchData(url);
 
   if (artObjects.length) {
     displayResults(artObjects, url);
   }
-
-  // Print results
-  console.log(artObjects);
 }
 
 //Manages retrieval and display of search queries
@@ -196,13 +183,10 @@ async function main() {
     const artObject = artObjects[index];
 
     console.log("Random object: ", artObject);
-    // renderImage(artObject);
     renderDataFront(artObject);
-    calcContainerHeight();
 
     const artObjectURL = `${artObject.links.self}?key=${query.key}`;
     const { artObject: artObjectDetails } = await fetchData(artObjectURL);
-    // console.log("Fetch results:", artObjectDetails);
     renderDataBack(artObjectDetails);
 
     // Flip Calendar card after mouse click
@@ -230,20 +214,32 @@ async function main() {
       searchArt(query.url);
     };
 
+    const scrollTrigger = { previous: false, current: false };
     window.onscroll = () => {
       // If day calendar is visible disable infinite scroll
       const scene = document.querySelector(".scene");
       if (scene.style.display !== "none") {
         return;
       }
-      // Calculate when we reach the end of document
-      const endOfDoc =
-        document.documentElement.scrollHeight - window.scrollY ===
+
+      scrollTrigger.previous = scrollTrigger.current;
+      scrollTrigger.current =
+        document.documentElement.scrollHeight - window.scrollY - 500 <=
         document.documentElement.clientHeight;
 
-      if (endOfDoc) {
+      if (!scrollTrigger.previous && scrollTrigger.current) {
+        console.log(
+          `%c` + JSON.stringify(scrollTrigger),
+          "color:white; background-color:green; padding: 0 5px;"
+        );
+
         query.p++;
         searchArt(query.url);
+      } else {
+        console.log(
+          `%c` + JSON.stringify(scrollTrigger),
+          "color:white; background-color:red; padding: 0 5px;"
+        );
       }
     };
 
@@ -279,8 +275,8 @@ async function main() {
     };
   } catch (error) {
     console.log("Something went wrong:", error);
+    window.location.reload(true);
   }
 }
-
 //Call main function after loading page
 window.addEventListener("load", main);
