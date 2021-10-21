@@ -255,6 +255,10 @@ async function main() {
       // Hide search container
       searchResults.style.display = "none";
 
+      // Show close button
+      const closeButton = document.querySelector(".close-button");
+      closeButton.style.display = "block";
+
       // Fetch selected artObject
       const selectedImageURL = event.target.objURL;
       const { artObject } = await fetchData(selectedImageURL);
@@ -263,6 +267,15 @@ async function main() {
       renderDataFront(artObject);
       calcContainerHeight();
       renderDataBack(artObject);
+    };
+
+    const closeButton = document.querySelector(".close-button");
+    closeButton.onclick = (event) => {
+      const scene = document.querySelector(".scene");
+      scene.style.display = "none";
+      // Hide search container
+      searchResults.style.display = "flex";
+      event.stopPropagation();
     };
   } catch (error) {
     console.log("Something went wrong:", error);
