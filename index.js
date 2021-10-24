@@ -144,17 +144,8 @@ async function searchArt(url) {
 
   if (artObjects.length) {
     displayResults(artObjects, url);
-  } else {
-    const scene = document.querySelector(".scene");
-    scene.style.display = "none";
-    const searchResults = document.querySelector(".search-results");
-    const nothingFound = document.createElement("div");
-    nothingFound.classList.add("nothing-found");
-    const message = document.createElement("p");
-    message.textContent = "Your search did not match any art objects";
-    nothingFound.append(message);
-    searchResults.append(nothingFound);
   }
+  return artObjects.length;
 }
 
 //Manages retrieval and display of search queries
@@ -216,7 +207,7 @@ async function main() {
     //Get search results after hitting "Enter"
     const searchField = document.getElementById("searchField");
 
-    searchField.onkeyup = (event) => {
+    searchField.onkeyup = async (event) => {
       query.q = searchField.value.trim();
       if (event.key !== "Enter" || !query.q) {
         return;
@@ -226,12 +217,30 @@ async function main() {
       // Remove any existing search results
       const searchResults = document.querySelector(".search-results");
       searchResults.innerHTML = "";
-      searchArt(query.url);
+      const numberOfResults = await searchArt(query.url);
+      if (!numberOfResults) {
+        // Hide day calendar
+        const scene = document.querySelector(".scene");
+        scene.style.display = "none";
+
+        // Create flex container for message
+        const nothingFound = document.createElement("div");
+        nothingFound.classList.add("nothing-found");
+
+        //Create message
+        const message = document.createElement("p");
+        message.textContent = "Your search did not match any art objects";
+        nothingFound.append(message);
+
+        // Append it to seearch results container
+        const searchResults = document.querySelector(".search-results");
+        searchResults.append(nothingFound);
+      }
     };
 
     const scrollTrigger = { previous: false, current: false };
-
-    window.onscroll = () => {
+    let numberOfResults = 1;
+    window.onscroll = async () => {
       // If day calendar is visible disable infinite scroll
       const scene = document.querySelector(".scene");
       if (scene.style.display !== "none") {
@@ -242,10 +251,9 @@ async function main() {
         document.documentElement.scrollHeight - window.scrollY - 500 <=
         document.documentElement.clientHeight;
 
-      if (!scrollTrigger.previous && scrollTrigger.current) {
+      if (!scrollTrigger.previous && scrollTrigger.current && numberOfResults) {
         query.p++;
-        searchArt(query.url);
-      } else {
+        numberOfResults = await searchArt(query.url);
       }
     };
 
@@ -290,6 +298,7 @@ async function main() {
       const scene = document.querySelector(".scene");
       scene.style.display = "none";
 
+      // Go back to search results
       searchResults.style.display = "flex";
       event.stopPropagation();
     };
