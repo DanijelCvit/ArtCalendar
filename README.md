@@ -2,7 +2,7 @@
 
 <p align="center"><img src="./assets/preview.gif" ></p>
 
-> Built using vanilla JS and Rijkststudio API.
+> Built using vanilla JS and Rijksstudio API.
 
 A demo using the Rijksstudio API to create a day calendar that serves a random art image on page load and provides any available info about the image.
 Users can also use the search feature to look among 400,000 art objects available in the Rijksmuseum database.
